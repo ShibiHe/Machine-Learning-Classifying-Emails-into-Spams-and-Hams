@@ -1,9 +1,13 @@
 __author__ = 'frankhe'
 import csv
+import math
 
 total_success = 0
 total_email = 0
 
+# do not use prior, because the real prior is 50/50
+prior_spam = math.log(float(3373)/12408)
+prior_ham = math.log(float(9035)/12408)
 
 def read_csv(name):
     f = open(name)
@@ -35,8 +39,8 @@ def test(data_name, p_ham, p_spam, result_is_spam=True):
         data = [int(x) for x in line.split()]
         data[1] -= 1    # 1-77386 -> 0-77385
         if data[0]==email_id:
-            p_is_spam += p_spam[data[1]] * data[2]
-            p_is_ham += p_ham[data[1]] * data[2]
+            p_is_spam += math.log(p_spam[data[1]]) * data[2]
+            p_is_ham += math.log(p_ham[data[1]]) * data[2]
         else:
             email_id = data[0]
             if email_id==1:
@@ -58,6 +62,7 @@ def test(data_name, p_ham, p_spam, result_is_spam=True):
 
 hamDistribution = read_csv("ham_train.csv")
 spamDistribution = read_csv("spam_train.csv")
+
 p_spam = calc_probability(spamDistribution)
 p_ham = calc_probability(hamDistribution)
 
